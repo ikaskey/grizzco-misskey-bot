@@ -25,6 +25,31 @@ const formatJst = (isoString) => {
   return `${zdt.month}月${zdt.day}日(${weekday}) ${hour}:${minute}`;
 };
 
+// ランダム支給ブキは API の name が金?・緑?どちらも「ランダム」で区別できないため、
+// 画像の SplatNet3 リソース ID（ハッシュ）で判別する。ハッシュは av5ja SDK 準拠で固定。
+/**
+ * Map of random-weapon image hashes to Misskey emoji badges.
+ * @since v3.0.2
+ * @type {Object.<string, string>}
+ */
+const RANDOM_WEAPON_BADGES = {
+  // 金?: クマサン印のブキ・ランダム (RandomGold)
+  '9d7272733ae2f2282938da17d69f13419a935eef42239132a02fcf37d8678f10': ':random_gold:',
+  // 緑?: 通常ランダム (RandomGreen)
+  '473fffb2442075078d8bb7125744905abdeae651b6a5b7453ae295582e45f7d1': ':random_green:',
+};
+
+/**
+ * Extract the SplatNet3 resource hash from a weapon image URL.
+ * @since v3.0.2
+ * @param {string} image - Weapon image URL.
+ * @returns {string|null} - 64-hex resource hash, or null if not found.
+ */
+const weaponImageHash = (image) => {
+  const matched = String(image ?? '').match(/ui_img\/([0-9a-f]{64})/);
+  return matched ? matched[1] : null;
+};
+
 /**
  * Class to generate message.
  * @since v1.0.0
@@ -107,21 +132,23 @@ const MessageMaker = class {
 
   // ブキバッジ存在チェック
   /**
-   * Generate weapon badge tag.
+   * Generate weapon badge tag. ランダム支給ブキは name が金?・緑?共通で
+   * 判別できないため、まず画像ハッシュで金?/緑?を確定し、無ければ name で検索する。
    * @since v1.0.0
-   * @param {string} name - Weapon name
-   * @returns {string} - Badge image tag or blank string
+   * @param {Object} weapon - Weapon object ({ name, image }).
+   * @returns {string} - Badge image tag or weapon name
    */
-  weaponBadgeIdMaker = (name) => {
-    let result;
-
-    if (Reflect.has(this.weaponBadges, name)) {
-      result = this.weaponBadges[name];
-    } else {
-      result = name;
+  weaponBadgeIdMaker = (weapon) => {
+    const hash = weaponImageHash(weapon.image);
+    if (hash && Reflect.has(RANDOM_WEAPON_BADGES, hash)) {
+      return RANDOM_WEAPON_BADGES[hash];
     }
 
-    return result;
+    if (Reflect.has(this.weaponBadges, weapon.name)) {
+      return this.weaponBadges[weapon.name];
+    }
+
+    return weapon.name;
   };
 
   // マルチにしたもの
@@ -134,8 +161,6 @@ const MessageMaker = class {
     console.log('func: message.maker');
     /** @type {string} */
     let msg = '';
-    /** @type {boolean} */
-    let random = false;
 
     if (this.isBigRun) {
       msg += ':big_run: ';
@@ -194,17 +219,9 @@ const MessageMaker = class {
     const { weapons } = this.shift;
     // eslint-disable-next-line no-restricted-syntax
     for (const weapon of weapons) {
-      const weaponBadge = this.weaponBadgeIdMaker(weapon.name);
+      const weaponBadge = this.weaponBadgeIdMaker(weapon);
       msg += weaponBadge;
       msg += ' ';
-      if (weapon.name === 'ランダム') {
-        random = true;
-      }
-    }
-
-    if (random) {
-      msg += '\n';
-      msg += '<small>ランダムはクマブキランダムの場合があります。</small>';
     }
 
     if (this.isNext || this.isFutureBigRun) {
