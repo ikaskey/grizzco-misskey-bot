@@ -1,3 +1,6 @@
 node_modules/
 .env
 .claude/
+
+# JSDoc 生成物（CI で生成・デプロイするため追跡しない）
+docs/

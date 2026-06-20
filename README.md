@@ -1,8 +1,8 @@
 # Grizzco Misskey-bot
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/sasagar/grizzco-misskey-bot/build-image.yml?label=Container%20Build&style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/ikaskey/grizzco-misskey-bot/build-image.yml?label=Container%20Build&style=for-the-badge)
 
-![GitHub package.json version (subfolder of monorepo)](https://img.shields.io/github/package-json/v/sasagar/grizzco-misskey-bot?style=for-the-badge) ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/sasagar/grizzco-misskey-bot?include_prereleases&style=for-the-badge)
+![GitHub package.json version (subfolder of monorepo)](https://img.shields.io/github/package-json/v/ikaskey/grizzco-misskey-bot?style=for-the-badge) ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/ikaskey/grizzco-misskey-bot?include_prereleases&style=for-the-badge)
 
 ## What
 
@@ -20,7 +20,7 @@ At any directory that specified, make `compose.yml` like below.
 ```yaml
 services:
   grizzco-misskey-bot:
-    image: ghcr.io/sasagar/grizzco-misskey-bot
+    image: ghcr.io/ikaskey/grizzco-misskey-bot
     restart: always
     volumes:
       - .env:/usr/src/app/.env:ro
