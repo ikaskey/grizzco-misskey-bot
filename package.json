@@ -1,6 +1,6 @@
 {
   "name": "grizzco-misskey-bot",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Splatoon 3 のサーモンラン/バチコン (coop) とバトル (regular/bankara/X/event) のスケジュール更新を Misskey に流す Bot。2アカウント運用に対応。",
   "homepage": "https://github.com/sasagar/grizzco-misskey-bot#readme",
   "bugs": {
