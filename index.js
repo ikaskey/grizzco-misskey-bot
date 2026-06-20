@@ -172,7 +172,7 @@ const salmonrun = async () => {
     }
     // ビッグランのシフトがあったら
     // 今がビッグランのシフトだったら
-    else if (Date(bigrun[0].start_time).getTime() / 1000 < getNowUnixTime()) {
+    else if (new Date(bigrun[0].start_time).getTime() / 1000 < getNowUnixTime()) {
       // 終了時刻を取得
       const end = new Date(bigrun[0].end_time);
       const endUnix = end.getTime() / 1000;
@@ -233,7 +233,7 @@ const salmonrun = async () => {
       // もし残りが2時間なら次のシフトのお知らせを追加
       if (restOfHours === 2) {
         // ビッグランよりも通常シフトが先なら次のシフトの情報を挟む
-        if (Date(regular[i + 1].start_time) < DataView(bigrun[0].start_time)) {
+        if (new Date(regular[i + 1].start_time) < new Date(bigrun[0].start_time)) {
           const next = new CoopMessageMaker(regular[i + 1], 40, false, true);
           const nextbigrun = new CoopMessageMaker(bigrun[0], 48, false, false, true, false, true);
 
@@ -273,7 +273,7 @@ const salmonrun = async () => {
     const teamcontest = teamcontestRes.results;
 
     if (teamcontest.length > 0) {
-      if (Date(teamcontest[0].start_time).getTime() / 1000 > nowUnix) {
+      if (new Date(teamcontest[0].start_time).getTime() / 1000 > nowUnix) {
         const nextteamcontest = new CoopMessageMaker(
           teamcontest[0],
           48,
@@ -287,7 +287,7 @@ const salmonrun = async () => {
       } else {
         // 残り時間を計算
         const restOfHours = Math.ceil(
-          (Date(teamcontest[0].end_time).getTime() / 1000 - nowUnix) / (60 * 60)
+          (new Date(teamcontest[0].end_time).getTime() / 1000 - nowUnix) / (60 * 60)
         );
 
         const nextteamcontest = new CoopMessageMaker(
@@ -330,12 +330,12 @@ const salmonrunextra = async () => {
   let msg = '';
   // レギュラーが時間内だったら、レギュラーを対象にする。それ以外はビッグラン扱い。
   if (
-    Date(regular[0].start_time).getTime() / 1000 < nowUnix &&
-    Date(regular[0].end_time).getTime() / 1000 > nowUnix
+    new Date(regular[0].start_time).getTime() / 1000 < nowUnix &&
+    new Date(regular[0].end_time).getTime() / 1000 > nowUnix
   ) {
     const now = new CoopMessageMaker(regular[0], 1, true);
     let nextShift;
-    if (bigrun.length === 0 || Date(regular[1].start_time) < Date(bigrun[0].start_time)) {
+    if (bigrun.length === 0 || new Date(regular[1].start_time) < new Date(bigrun[0].start_time)) {
       [, nextShift] = regular;
     } else {
       [nextShift] = bigrun;
