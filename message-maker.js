@@ -1,29 +1,7 @@
 import * as fs from 'node:fs';
 
-// 日本語の曜日ラベル。Temporal.ZonedDateTime.dayOfWeek は 1=月曜 ... 7=日曜。
-/**
- * Japanese short weekday labels indexed by Temporal dayOfWeek (1-7).
- * @since v2.0.0
- * @type {string[]}
- */
-const WEEKDAYS_JA = ['月', '火', '水', '木', '金', '土', '日'];
-
-/**
- * Format an ISO datetime string into a JST string like "5月25日(月) 10:00".
- * Uses the built-in Temporal API, so no external date library is required.
- * @since v2.0.0
- * @param {string} isoString - ISO 8601 datetime string.
- * @returns {string} - Formatted JST datetime, e.g. "5月25日(月) 10:00".
- */
-const formatJst = (isoString) => {
-  const zdt = Temporal.Instant.fromEpochMilliseconds(Date.parse(isoString)).toZonedDateTimeISO(
-    'Asia/Tokyo'
-  );
-  const weekday = WEEKDAYS_JA[zdt.dayOfWeek - 1];
-  const hour = String(zdt.hour).padStart(2, '0');
-  const minute = String(zdt.minute).padStart(2, '0');
-  return `${zdt.month}月${zdt.day}日(${weekday}) ${hour}:${minute}`;
-};
+// eslint-disable-next-line import/extensions
+import { formatJst } from './date-format.js';
 
 // ランダム支給ブキは API の name が金?・緑?どちらも「ランダム」で区別できないため、
 // 画像の SplatNet3 リソース ID（ハッシュ）で判別する。ハッシュは av5ja SDK 準拠で固定。
