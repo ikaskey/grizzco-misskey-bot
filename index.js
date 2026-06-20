@@ -110,6 +110,26 @@ const sendMessage = async (client, msg, visibility = null, cw = null, replyId = 
 // COOP (サーモンラン + バチコン) -- posts via grizzcoClient
 // =============================================================================
 
+// 残り2時間のシフトに対し、終了1時間前の追加お知らせを予約する共通処理。
+/**
+ * Schedule the extra "last hour" Salmon Run note, fired 1 hour before the
+ * given shift end time. Extracted from the repeated block in salmonrun
+ * (refs #26, #27).
+ * @since v3.0.3
+ * @param {string} endTime - ISO end_time of the reference shift.
+ * @returns {void}
+ */
+const scheduleSalmonExtraNote = (endTime) => {
+  // 一回だけ1時間おきにしたいので、追加する
+  const extraNoteDate = (new Date(endTime).getTime() / 1000 - 60 * 60) * 1000;
+  console.log(extraNoteDate.toLocaleString());
+  // eslint-disable-next-line no-use-before-define
+  salmonjobExtra = schedule.scheduleJob(extraNoteDate, () => {
+    salmonrunextra();
+  });
+  console.log(`set: salmonrunextra at ${extraNoteDate}`);
+};
+
 // サーモンランルール
 /**
  * Make and send Salmon Run / バチコン message to Misskey (grizzco account).
@@ -157,15 +177,7 @@ const salmonrun = async () => {
         msg += '\n---\n';
         msg += next.maker();
 
-        // 一回だけ1時間おきにしたいので、追加する
-        const extraDate = new Date(regular[i].end_time);
-        const extraNoteDate = (extraDate.getTime() / 1000 - 60 * 60) * 1000;
-        console.log(extraNoteDate.toLocaleString());
-        // eslint-disable-next-line no-use-before-define
-        salmonjobExtra = schedule.scheduleJob(extraNoteDate, () => {
-          salmonrunextra();
-        });
-        console.log(`set: salmonrunextra at ${extraNoteDate}`);
+        scheduleSalmonExtraNote(regular[i].end_time);
       }
       console.log(msg);
       sendMessage(grizzcoClient, msg);
@@ -195,15 +207,7 @@ const salmonrun = async () => {
         msg += '\n---\n';
         msg += next.maker();
 
-        // 一回だけ1時間おきにしたいので、追加する
-        const extraDate = new Date(regular[0].end_time);
-        const extraNoteDate = (extraDate.getTime() / 1000 - 60 * 60) * 1000;
-        console.log(extraNoteDate.toLocaleString());
-        // eslint-disable-next-line no-use-before-define
-        salmonjobExtra = schedule.scheduleJob(extraNoteDate, () => {
-          salmonrunextra();
-        });
-        console.log(`set: salmonrunextra at ${extraNoteDate}`);
+        scheduleSalmonExtraNote(regular[0].end_time);
       }
       sendMessage(grizzcoClient, msg);
     }
@@ -249,15 +253,7 @@ const salmonrun = async () => {
           msg += nextbigrun.maker();
         }
 
-        // 一回だけ1時間おきにしたいので、追加する
-        const extraDate = new Date(regular[0].end_time);
-        const extraNoteDate = (extraDate.getTime() / 1000 - 60 * 60) * 1000;
-        console.log(extraNoteDate.toLocaleString());
-        // eslint-disable-next-line no-use-before-define
-        salmonjobExtra = schedule.scheduleJob(extraNoteDate, () => {
-          salmonrunextra();
-        });
-        console.log(`set: salmonrunextra at ${extraNoteDate}`);
+        scheduleSalmonExtraNote(regular[0].end_time);
       }
       // ビッグランの情報を付ける
       else {
