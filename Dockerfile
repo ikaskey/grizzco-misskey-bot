@@ -1,4 +1,4 @@
-FROM node:26-slim
+FROM node:26.12.1-slim
 
 RUN apt update \
     && apt install -y libjemalloc2 \
